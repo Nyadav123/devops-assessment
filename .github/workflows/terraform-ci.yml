@@ -1,0 +1,49 @@
+name: "Terraform Integration Pipeline"
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "infra/**"
+
+jobs:
+  terraform-validate:
+    name: "Validate & Plan"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        path: [dev, prod]
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+        working-directory: ./infra
+
+      - name: Terraform Init
+        run: terraform init -backend=false
+        working-directory: ./infra/envs/${{ matrix.path }}
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ./infra/envs/${{ matrix.path }}
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          terraform plan -refresh=false -no-color -out=tfplan
+          terraform show -no-color tfplan > plan_output.txt
+        working-directory: ./infra/envs/${{ matrix.path }}
+
+      - name: Archive Terraform Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan-${{ matrix.path }}
+          path: ./infra/envs/${{ matrix.path }}/plan_output.txt

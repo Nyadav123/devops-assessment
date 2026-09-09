@@ -1,0 +1,17 @@
+aws_region                  = "us-east-1"
+environment                 = "dev"
+vpc_cidr                    = "10.0.0.0/16"
+public_subnet_cidrs         = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs        = ["10.0.10.0/24", "10.0.20.0/24"]
+availability_zones          = ["us-east-1a", "us-east-1b"]
+container_image             = "nginx:alpine"
+ecs_cpu                     = 256
+ecs_memory                  = 512
+ecs_app_count               = 1
+rds_instance_class          = "db.t4g.micro"
+rds_allocated_storage       = 20
+db_name                     = "bookings_dev"
+db_username                 = "postgres"
+db_password                 = "DevSecurePass123!"
+rds_backup_retention_period = 1
+rds_deletion_protection     = false
